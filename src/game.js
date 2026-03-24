@@ -5,14 +5,70 @@ class MarketScene extends Phaser.Scene {
   constructor() {
     super("MarketScene");
     this.totalTime = 300;
-    this.worldWidth = 1920;
-    this.worldHeight = 1080;
+    this.worldWidth = 1408;
+    this.worldHeight = 832;
   }
 
   preload() {
-    this.load.spritesheet("player-shopper", "./assets/player/shopper-sheet.png", {
-      frameWidth: 64,
+    this.load.spritesheet("player-run", "./assets/player/Adam_run_32x32.png", {
+      frameWidth: 32,
       frameHeight: 64
+    });
+    this.load.spritesheet("player-idle", "./assets/player/Adam_idle_anim_32x32.png", {
+      frameWidth: 32,
+      frameHeight: 64
+    });
+    this.load.spritesheet("npc-mia-idle", "./assets/player/Mia_idle_anim_32x32.png", {
+      frameWidth: 32,
+      frameHeight: 32
+    });
+    this.load.spritesheet("npc-amelia-idle", "./assets/player/Amelia_idle_anim_32x32.png", {
+      frameWidth: 32,
+      frameHeight: 64
+    });
+    this.load.spritesheet("npc-ava-idle", "./assets/player/Ava_idle_anim_32x32.png", {
+      frameWidth: 32,
+      frameHeight: 64
+    });
+    this.load.spritesheet("npc-emma-idle", "./assets/player/Emma_idle_anim_32x32.png", {
+      frameWidth: 32,
+      frameHeight: 64
+    });
+    this.load.spritesheet("npc-yuna-idle", "./assets/player/Yuna_idle_anim_32x32.png", {
+      frameWidth: 32,
+      frameHeight: 64
+    });
+    this.load.spritesheet("npc-riku-idle", "./assets/player/Riku_idle_anim_32x32.png", {
+      frameWidth: 32,
+      frameHeight: 64
+    });
+    this.load.spritesheet("npc-lena-idle", "./assets/player/Chef_Lena_idle_anim_32x32.png", {
+      frameWidth: 32,
+      frameHeight: 64
+    });
+    this.load.spritesheet("npc-taro-idle", "./assets/player/Taro_idle_anim_32x32.png", {
+      frameWidth: 32,
+      frameHeight: 64
+    });
+    this.load.spritesheet("npc-ken-idle", "./assets/player/Ken_idle_anim_32x32.png", {
+      frameWidth: 32,
+      frameHeight: 64
+    });
+    this.load.image("store-cooler-vegetables-a", "./assets/grocery_store/Grocery_Store_Singles_32x32_57.png");
+    this.load.image("store-cooler-vegetables-b", "./assets/grocery_store/Grocery_Store_Singles_32x32_58.png");
+    this.load.image("store-cooler-dairy-a", "./assets/grocery_store/Grocery_Store_Singles_32x32_64.png");
+    this.load.image("store-cooler-dairy-b", "./assets/grocery_store/Grocery_Store_Singles_32x32_65.png");
+    this.load.image("store-aisle-a", "./assets/grocery_store/Grocery_Store_Singles_32x32_113.png");
+    this.load.image("store-aisle-b", "./assets/grocery_store/Grocery_Store_Singles_32x32_114.png");
+    this.load.image("store-aisle-c", "./assets/grocery_store/Grocery_Store_Singles_32x32_115.png");
+    this.load.image("store-aisle-d", "./assets/grocery_store/Grocery_Store_Singles_32x32_116.png");
+    this.load.image("store-checkout-left", "./assets/grocery_store/Grocery_Store_Singles_32x32_159.png");
+    this.load.image("store-checkout-right", "./assets/grocery_store/Grocery_Store_Singles_32x32_160.png");
+    this.load.image("store-produce-a", "./assets/grocery_store/Grocery_Store_Singles_32x32_422.png");
+    this.load.image("store-produce-b", "./assets/grocery_store/Grocery_Store_Singles_32x32_423.png");
+    this.load.spritesheet("market-background-module", "./assets/background/Ice_Cream_Shop_Design_layer_1_32x32.png", {
+      frameWidth: 32,
+      frameHeight: 32
     });
   }
 
@@ -60,6 +116,11 @@ class MarketScene extends Phaser.Scene {
     g.generateTexture("player", 28, 38);
     g.clear();
 
+    g.fillStyle(0xffffff, 1);
+    g.fillRect(0, 0, 2, 2);
+    g.generateTexture("collision-block", 2, 2);
+    g.clear();
+
     g.fillStyle(0x334155, 1);
     g.fillRoundedRect(0, 0, 18, 46, 4);
     g.generateTexture("shelf", 18, 46);
@@ -77,39 +138,139 @@ class MarketScene extends Phaser.Scene {
   }
 
   createMap() {
-    this.add.rectangle(this.worldWidth / 2, this.worldHeight / 2, this.worldWidth, this.worldHeight, 0x0f274f, 0.9);
-
-    this.add.text(150, 180, "野菜", { fontSize: "18px", color: "#bfdbfe", fontFamily: "Segoe UI, sans-serif" });
-    this.add.text(820, 180, "缶詰", { fontSize: "18px", color: "#bfdbfe", fontFamily: "Segoe UI, sans-serif" });
-    this.add.text(1560, 180, "乳製品", { fontSize: "18px", color: "#bfdbfe", fontFamily: "Segoe UI, sans-serif" });
-    this.add.text(1240, 630, "ハーブ", { fontSize: "18px", color: "#bfdbfe", fontFamily: "Segoe UI, sans-serif" });
-    this.add.text(1510, 630, "スパイス", { fontSize: "18px", color: "#bfdbfe", fontFamily: "Segoe UI, sans-serif" });
+    this.createBackgroundSections();
 
     this.walls = this.physics.add.staticGroup();
-    const shelfX = [150, 240, 480, 570, 870, 960, 1220, 1310, 1560, 1650];
-    shelfX.forEach((x) => {
-      [245, 330, 415, 600, 690, 780].forEach((y) => {
-        this.walls.create(x, y, "shelf");
-      });
+    this.wallBounds = this.physics.add.staticGroup();
+    const fixtures = [
+      { key: "store-cooler-vegetables-a", x: 176, y: 176 },
+      { key: "store-cooler-vegetables-b", x: 256, y: 176 },
+      { key: "store-cooler-dairy-a", x: 496, y: 176 },
+      { key: "store-cooler-dairy-b", x: 576, y: 176 },
+      { key: "store-cooler-vegetables-a", x: 816, y: 176 },
+      { key: "store-cooler-dairy-b", x: 896, y: 176 },
+      { key: "store-aisle-a", x: 240, y: 336 },
+      { key: "store-aisle-d", x: 240, y: 432 },
+      { key: "store-aisle-c", x: 240, y: 528 },
+      { key: "store-aisle-b", x: 480, y: 336 },
+      { key: "store-aisle-a", x: 480, y: 432 },
+      { key: "store-aisle-d", x: 480, y: 528 },
+      { key: "store-aisle-c", x: 720, y: 336 },
+      { key: "store-aisle-b", x: 720, y: 432 },
+      { key: "store-aisle-a", x: 720, y: 528 },
+      { key: "store-aisle-d", x: 960, y: 336 },
+      { key: "store-aisle-c", x: 960, y: 432 },
+      { key: "store-aisle-b", x: 960, y: 528 },
+      { key: "store-produce-a", x: 224, y: 704 },
+      { key: "store-produce-b", x: 384, y: 704 },
+      { key: "store-checkout-left", x: 1104, y: 712 },
+      { key: "store-checkout-right", x: 1232, y: 712 }
+    ];
+    fixtures.forEach(({ key, x, y }) => {
+      this.walls.create(x, y, key);
     });
 
-    this.checkoutDesk = this.add.rectangle(540, 760, 180, 70, 0x1f2937, 0.95);
-    this.checkoutDesk.setStrokeStyle(2, 0xfde68a);
-    this.checkoutLabel = this.add.text(494, 745, "レジ", {
+    const boundaryFixtures = [
+      { x: this.worldWidth / 2, y: 48, width: this.worldWidth, height: 96 },
+      { x: 16, y: 464, width: 32, height: 736 },
+      { x: this.worldWidth - 16, y: 464, width: 32, height: 736 },
+      { x: 304, y: this.worldHeight - 16, width: 608, height: 32 },
+      { x: 1104, y: this.worldHeight - 16, width: 608, height: 32 }
+    ];
+    boundaryFixtures.forEach(({ x, y, width, height }) => {
+      const wall = this.wallBounds.create(x, y, "collision-block");
+      wall.setDisplaySize(width, height);
+      wall.setVisible(false);
+      wall.refreshBody();
+    });
+
+    this.checkoutDesk = { x: 1168, y: 736 };
+    this.checkoutLabel = this.add.text(1148, 776, "レジ", {
       fontSize: "18px",
       color: "#fde68a",
       fontFamily: "Segoe UI, sans-serif"
     });
+    this.checkoutLabel.setDepth(3);
+
+    const sectionLabels = [
+      { x: 164, y: 102, text: "野菜" },
+      { x: 488, y: 102, text: "缶詰" },
+      { x: 812, y: 102, text: "乳製品" },
+      { x: 198, y: 632, text: "ハーブ" },
+      { x: 358, y: 632, text: "スパイス" }
+    ];
+    sectionLabels.forEach(({ x, y, text }) => {
+      this.add.text(x, y, text, {
+        fontSize: "18px",
+        color: "#bfdbfe",
+        fontFamily: "Segoe UI, sans-serif"
+      }).setDepth(3);
+    });
+  }
+
+  createBackgroundSections() {
+    const tileSize = 32;
+    const columns = Math.ceil(this.worldWidth / tileSize);
+    const rows = Math.ceil(this.worldHeight / tileSize);
+    const openingStart = Math.floor(columns / 2) - 3;
+    const openingEnd = openingStart + 6;
+    const frames = {
+      topLeft: 0,
+      topEdge: 1,
+      topRight: 11,
+      upperLeft: 12,
+      upperWall: 13,
+      upperRight: 23,
+      trimLeft: 24,
+      trim: 25,
+      trimRight: 35,
+      leftWall: 48,
+      floor: 52,
+      rightWall: 59,
+      bottomLeft: 108,
+      bottomWall: 109,
+      bottomRight: 119
+    };
+
+    for (let row = 0; row < rows; row += 1) {
+      for (let column = 0; column < columns; column += 1) {
+        let frame = frames.floor;
+
+        if (row === 0) {
+          frame = column === 0 ? frames.topLeft : column === columns - 1 ? frames.topRight : frames.topEdge;
+        } else if (row === 1) {
+          frame = column === 0 ? frames.upperLeft : column === columns - 1 ? frames.upperRight : frames.upperWall;
+        } else if (row === 2) {
+          frame = column === 0 ? frames.trimLeft : column === columns - 1 ? frames.trimRight : frames.trim;
+        } else if (column === 0) {
+          frame = frames.leftWall;
+        } else if (column === columns - 1) {
+          frame = frames.rightWall;
+        } else if (row === rows - 1 && (column < openingStart || column >= openingEnd)) {
+          frame = column === 0 ? frames.bottomLeft : column === columns - 1 ? frames.bottomRight : frames.bottomWall;
+        }
+
+        this.drawBackgroundTile(column * tileSize, row * tileSize, frame);
+      }
+    }
+  }
+
+  drawBackgroundTile(x, y, frame) {
+    const tile = this.add.image(x, y, "market-background-module", frame);
+    tile.setOrigin(0);
+    tile.setDepth(-10);
   }
 
   createPlayer() {
-    this.player = this.physics.add.sprite(120, 940, "player-shopper", 1);
+    this.player = this.physics.add.sprite(112, 756, "player-idle", 18);
     this.playerDirection = "down";
-    this.player.setScale(0.95);
+    this.player.setScale(1);
     this.player.setCollideWorldBounds(true);
-    this.player.body.setSize(22, 30);
+    this.player.body.setSize(14, 18);
+    this.player.body.setOffset(9, 44);
     this.playerSpeed = 185;
     this.physics.add.collider(this.player, this.walls);
+    this.physics.add.collider(this.player, this.wallBounds);
     this.physics.world.setBounds(0, 0, this.worldWidth, this.worldHeight);
     this.cameras.main.setBounds(0, 0, this.worldWidth, this.worldHeight);
     this.cameras.main.startFollow(this.player, true, 0.12, 0.12);
@@ -123,26 +284,110 @@ class MarketScene extends Phaser.Scene {
 
     this.anims.create({
       key: "player-walk-down",
-      frames: this.anims.generateFrameNumbers("player-shopper", { start: 1, end: 6 }),
+      frames: this.anims.generateFrameNumbers("player-run", { start: 18, end: 23 }),
       frameRate: 10,
       repeat: -1
     });
     this.anims.create({
       key: "player-walk-up",
-      frames: this.anims.generateFrameNumbers("player-shopper", { start: 23, end: 28 }),
+      frames: this.anims.generateFrameNumbers("player-run", { start: 6, end: 11 }),
       frameRate: 10,
       repeat: -1
     });
     this.anims.create({
       key: "player-walk-right",
-      frames: this.anims.generateFrameNumbers("player-shopper", { start: 45, end: 50 }),
+      frames: this.anims.generateFrameNumbers("player-run", { start: 0, end: 5 }),
       frameRate: 10,
       repeat: -1
     });
     this.anims.create({
       key: "player-walk-left",
-      frames: this.anims.generateFrameNumbers("player-shopper", { start: 67, end: 72 }),
+      frames: this.anims.generateFrameNumbers("player-run", { start: 12, end: 17 }),
       frameRate: 10,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "player-idle-down",
+      frames: this.anims.generateFrameNumbers("player-idle", { start: 18, end: 23 }),
+      frameRate: 6,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "player-idle-up",
+      frames: this.anims.generateFrameNumbers("player-idle", { start: 6, end: 11 }),
+      frameRate: 6,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "player-idle-right",
+      frames: this.anims.generateFrameNumbers("player-idle", { start: 0, end: 5 }),
+      frameRate: 6,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "player-idle-left",
+      frames: this.anims.generateFrameNumbers("player-idle", { start: 12, end: 17 }),
+      frameRate: 6,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "npc-amelia-idle-left",
+      frames: this.anims.generateFrameNumbers("npc-amelia-idle", { start: 12, end: 17 }),
+      frameRate: 6,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "npc-taro-idle-left",
+      frames: this.anims.generateFrameNumbers("npc-taro-idle", { start: 12, end: 17 }),
+      frameRate: 6,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "npc-taro-idle-down",
+      frames: this.anims.generateFrameNumbers("npc-taro-idle", { start: 18, end: 23 }),
+      frameRate: 6,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "npc-ken-idle-down",
+      frames: this.anims.generateFrameNumbers("npc-ken-idle", { start: 18, end: 23 }),
+      frameRate: 6,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "npc-lena-idle-down",
+      frames: this.anims.generateFrameNumbers("npc-lena-idle", { start: 18, end: 23 }),
+      frameRate: 6,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "npc-riku-idle-down",
+      frames: this.anims.generateFrameNumbers("npc-riku-idle", { start: 18, end: 23 }),
+      frameRate: 6,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "npc-yuna-idle-down",
+      frames: this.anims.generateFrameNumbers("npc-yuna-idle", { start: 18, end: 23 }),
+      frameRate: 6,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "npc-emma-idle-down",
+      frames: this.anims.generateFrameNumbers("npc-emma-idle", { start: 18, end: 23 }),
+      frameRate: 6,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "npc-ava-idle-down",
+      frames: this.anims.generateFrameNumbers("npc-ava-idle", { start: 18, end: 23 }),
+      frameRate: 6,
+      repeat: -1
+    });
+    this.anims.create({
+      key: "npc-mia-idle-down",
+      frames: this.anims.generateFrameNumbers("npc-mia-idle", { start: 0, end: 3 }),
+      frameRate: 6,
       repeat: -1
     });
   }
@@ -152,34 +397,56 @@ class MarketScene extends Phaser.Scene {
       return;
     }
 
-    const idleFrames = {
-      down: 1,
-      up: 23,
-      right: 45,
-      left: 67
+    const idleAnimations = {
+      down: "player-idle-down",
+      up: "player-idle-up",
+      right: "player-idle-right",
+      left: "player-idle-left"
     };
-    this.player.anims.stop();
-    this.player.setFrame(idleFrames[this.playerDirection] ?? 1);
+    this.player.anims.play(idleAnimations[this.playerDirection] ?? "player-idle-down", true);
   }
 
   createNpcStaff() {
     this.npcs = [
-      this.createNpc(90, 120, "Mia", "Vegetables", true, "ingredient", { id: "mia", base: 0xfb7185, accent: 0x7f1d1d, style: 0 }),
-      this.createNpc(960, 110, "Ken", "Canned Food", true, "location", { id: "ken", base: 0x60a5fa, accent: 0x1e3a8a, style: 1 }),
-      this.createNpc(1750, 120, "Sora", "Dairy", true, "color", { id: "sora", base: 0xfbbf24, accent: 0x78350f, style: 2 }),
-      this.createNpc(1280, 640, "Lena", "Herbs", true, "type", { id: "lena", base: 0x34d399, accent: 0x064e3b, style: 3 }),
-      this.createNpc(320, 900, "Noah", "Snacks", false, "smalltalk", { id: "noah", base: 0xc084fc, accent: 0x581c87, style: 4 }),
-      this.createNpc(700, 870, "Emma", "Bakery", false, "smalltalk", { id: "emma", base: 0xfda4af, accent: 0x881337, style: 5 }),
-      this.createNpc(1120, 900, "Riku", "Frozen", false, "smalltalk", { id: "riku", base: 0x67e8f9, accent: 0x155e75, style: 6 }),
-      this.createNpc(1500, 910, "Ava", "Beverages", false, "smalltalk", { id: "ava", base: 0xfdba74, accent: 0x7c2d12, style: 7 }),
-      this.createNpc(1640, 690, "Yuna", "Home Goods", false, "smalltalk", { id: "yuna", base: 0xa3e635, accent: 0x365314, style: 8 }),
-      this.createNpc(540, 640, "Taro", "Checkout", false, "smalltalk", { id: "taro", base: 0x94a3b8, accent: 0x0f172a, style: 9 })
+      this.createNpc(160, 128, "Mia", "Vegetables", true, "ingredient", { id: "mia", spriteSheetKey: "npc-mia-idle", idleAnimationKey: "npc-mia-idle-down", initialFrame: 0, bodySize: { width: 14, height: 14 }, bodyOffset: { x: 9, y: 14 } }),
+      this.createNpc(488, 128, "Ken", "Canned Food", true, "location", { id: "ken", spriteSheetKey: "npc-ken-idle", idleAnimationKey: "npc-ken-idle-down" }),
+      this.createNpc(812, 128, "Sora", "Dairy", true, "color", { id: "sora", base: 0xfbbf24, accent: 0x78350f, style: 2 }),
+      this.createNpc(136, 676, "Lena", "Herbs", true, "type", { id: "lena", spriteSheetKey: "npc-lena-idle", idleAnimationKey: "npc-lena-idle-down" }),
+      this.createNpc(104, 712, "Amelia", "Snacks", false, "smalltalk", { id: "amelia", spriteSheetKey: "npc-amelia-idle", idleAnimationKey: "npc-amelia-idle-left" }),
+      this.createNpc(560, 720, "Emma", "Bakery", false, "smalltalk", { id: "emma", spriteSheetKey: "npc-emma-idle", idleAnimationKey: "npc-emma-idle-down" }),
+      this.createNpc(744, 720, "Riku", "Frozen", false, "smalltalk", { id: "riku", spriteSheetKey: "npc-riku-idle", idleAnimationKey: "npc-riku-idle-down" }),
+      this.createNpc(936, 720, "Ava", "Beverages", false, "smalltalk", { id: "ava", spriteSheetKey: "npc-ava-idle", idleAnimationKey: "npc-ava-idle-down" }),
+      this.createNpc(1016, 648, "Yuna", "Home Goods", false, "smalltalk", { id: "yuna", spriteSheetKey: "npc-yuna-idle", idleAnimationKey: "npc-yuna-idle-down" }),
+      this.createNpc(1168, 648, "Taro", "Checkout", false, "smalltalk", { id: "taro", spriteSheetKey: "npc-taro-idle", idleAnimationKey: "npc-taro-idle-down" })
     ];
   }
 
   createNpc(x, y, name, section, givesHint, clueType, avatar) {
-    const textureKey = this.getNpcTextureKey(avatar);
-    const sprite = this.physics.add.staticImage(x, y, textureKey);
+    let sprite;
+    if (avatar.spriteSheetKey) {
+      sprite = this.physics.add.sprite(x, y, avatar.spriteSheetKey, avatar.initialFrame ?? 12);
+      sprite.play(avatar.idleAnimationKey, true);
+    } else {
+      const textureKey = this.getNpcTextureKey(avatar);
+      sprite = this.physics.add.sprite(x, y, textureKey);
+    }
+    sprite.setImmovable(true);
+    sprite.body.allowGravity = false;
+    sprite.body.moves = false;
+    if (avatar.bodySize && avatar.bodyOffset) {
+      sprite.body.setSize(avatar.bodySize.width, avatar.bodySize.height);
+      sprite.body.setOffset(avatar.bodyOffset.x, avatar.bodyOffset.y);
+    } else if (avatar.spriteSheetKey) {
+      sprite.body.setSize(14, 18);
+      sprite.body.setOffset(9, 44);
+    } else {
+      sprite.body.setSize(20, 20);
+      sprite.body.setOffset(6, 6);
+    }
+    this.physics.add.collider(this.player, sprite);
+    this.physics.add.collider(sprite, this.walls);
+    this.physics.add.collider(sprite, this.wallBounds);
+
     const nameLabel = this.add.text(x, y - 24, name, {
       fontSize: "16px",
       color: "#fde68a",
@@ -248,6 +515,10 @@ class MarketScene extends Phaser.Scene {
     });
     label.setOrigin(0.5);
     this.physics.add.collider(orb, this.walls);
+    this.physics.add.collider(orb, this.wallBounds);
+    this.npcs.forEach((npc) => {
+      this.physics.add.collider(orb, npc.sprite);
+    });
     this.items.push({ ing, orb, label });
   }
 

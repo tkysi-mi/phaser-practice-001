@@ -1,0 +1,27 @@
+{
+  "name": "phaser-practice-001",
+  "version": "1.0.0",
+  "description": "Phaser 3 を使った、CEFR A2 向けの買い物タスク型英語学習ゲームです。",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tkysi-mi/phaser-practice-001.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/tkysi-mi/phaser-practice-001/issues"
+  },
+  "homepage": "https://github.com/tkysi-mi/phaser-practice-001#readme",
+  "dependencies": {
+    "phaser": "^3.90.0"
+  }
+}
